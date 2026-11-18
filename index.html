@@ -4,8 +4,8 @@
 <h2>家具编辑器</h2><details><summary>新增尺寸核对：暂不改变墙线</summary><p>总面宽8895毫米；左深6929、右深6989毫米，差60毫米，原因待核。</p><p>原卧室A：4156×2747≈11.42㎡；原卧室B（现客厅）：2198×2747≈6.04㎡；厨房2541×4448≈11.30㎡；阳台2541×1331≈3.38㎡。</p><p>原客厅4173×2851≈11.90㎡；14.2㎡可能包含部分走廊，暂不因此改动墙线。厨房2541×4448≈11.30㎡。卫生间按补充的约2.1×1.7米估算为3.57㎡，与标注3.8㎡接近但不完全相等；2181×2851不作为卫生间净长宽使用。以上按不同标注范围理解，保留已确认布局，不据此拉伸房间。</p><p>当前模型仍沿用确认截图的比例估算，未按新增毫米尺寸重新校准；家具米数是参考模型值，不作为施工尺寸。</p></details><p class="hint">尺寸来自截图估算，不能代替量房。允许重叠，橙色提示仅供核对。</p>
 <p id="modeInfo">立体浏览：家具可选中拖动。</p>
 <label>家具列表<select id="items"><option value="">请选择家具</option></select></label>
-<div class="fields"><label>添加类型<select id="addType"><option value="bed">床</option><option value="fridge">冰箱</option><option value="wardrobe">衣柜</option><option value="table">餐桌</option><option value="chair">餐椅</option><option value="vanity">化妆桌</option><option value="sofa">沙发</option><option value="window">窗户模拟标记</option></select></label><div><button id="addItem">添加家具</button></div></div>
-<p class="hint">窗户仅为可移动蓝玻璃模拟标记，不切墙、不改变原窗位置。添加窗户前会再次确认。</p>
+<div class="fields"><label>添加类型<select id="addType"><option value="fridge">冰箱</option><option value="tv">壁挂电视</option><option value="bed">床</option><option value="wardrobe">衣柜</option><option value="table">餐桌</option><option value="chair">餐椅</option><option value="vanity">化妆桌</option><option value="sofa">沙发</option><option value="window">窗户模拟标记</option></select></label><div><button id="addItem">添加家具</button></div></div>
+<p class="hint">默认方案已采用你上传的10件家具。冰箱和壁挂电视在添加类型最前面；电视底边离地1.1米，无落地支架，添加后请拖至目标墙面并旋转对齐（不自动吸墙）。窗户仅为可移动蓝玻璃模拟标记，不切墙、不改变原窗位置。</p>
 <fieldset id="selectionFields" disabled><div class="fields">
 <label>宽度（米）<input id="w" type="number" min="0.1" max="6" step="0.01"></label><label>深度（米）<input id="d" type="number" min="0.03" max="6" step="0.01"></label><label>高度（米）<input id="h" type="number" min="0.03" max="3" step="0.01"></label>
 <label>X 中心（米）<input id="x" type="number" step="0.01"></label><label>Z 中心（米）<input id="z" type="number" step="0.01"></label><label>角度（度）<input id="rotation" type="number" step="1" min="-360" max="360"></label><label>颜色<input id="color" type="color"></label></div>
@@ -28,13 +28,14 @@ function line(points,color,widthHeight=.02){let g=new T.BufferGeometry().setFrom
 box(268,343,2,51,2,mats.oak);box(191,410,53,2,2,mats.oak);let arc=[];for(let i=0;i<=32;i++){let a=i*Math.PI/64;arc.push([269+51*Math.sin(a),343+51*Math.cos(a)])}line(arc,'#b78050');arc=[];for(let i=0;i<=32;i++){let a=i*Math.PI/64;arc.push([244-53*Math.cos(a),411-53*Math.sin(a)])}line(arc,'#b78050');
 
 // 家具以米为单位，中心点严格沿用原 X/Z 映射；建筑几何不参与编辑。
-const $=id=>document.getElementById(id), KEY='locked-layout:furniture:v1', VERSION=1;
-const names={bed:'床',fridge:'冰箱',wardrobe:'衣柜',table:'餐桌',chair:'餐椅',vanity:'化妆桌',sofa:'沙发',window:'窗户模拟标记'};
-const defaults={bed:[1.45,1.91,.54,'#9cac91'],fridge:[.65,.65,1.8,'#d0d9db'],wardrobe:[.59,1.38,2.325,'#bf9b68'],table:[1.1,.6,.755,'#d4b58a'],chair:[.45,.45,.85,'#bf9b68'],vanity:[1,.45,1.35,'#d4b58a'],sofa:[1.5,.8,.75,'#9cac91'],window:[1.2,.08,1.1,'#63b9df']};
+const $=id=>document.getElementById(id), KEY='locked-layout:furniture:shared-20261118', VERSION=1;
+const names={bed:'床',fridge:'冰箱',tv:'壁挂电视',wardrobe:'衣柜',table:'餐桌',chair:'餐椅',vanity:'化妆桌',sofa:'沙发',window:'窗户模拟标记'};
+const defaults={bed:[1.45,1.91,.54,'#9cac91'],fridge:[.65,.65,1.8,'#d0d9db'],tv:[1.23,.06,.71,'#20252d'],wardrobe:[.59,1.38,2.325,'#bf9b68'],table:[1.1,.6,.755,'#d4b58a'],chair:[.45,.45,.85,'#bf9b68'],vanity:[1,.45,1.35,'#d4b58a'],sofa:[1.5,.8,.75,'#9cac91'],window:[1.2,.08,1.1,'#63b9df']};
 const fields=['w','d','h','x','z','rotation','color'];
 const uid=()=>globalThis.crypto?.randomUUID?.()||('f'+Date.now().toString(36)+Math.random().toString(36).slice(2));
 function initial(type,x,z,w,d,h,color){return{id:uid(),type,x:X(x+w/2),z:Z(z+d/2),w:w*scale,d:d*scale,h,rotation:0,color}}
-let furniture=[initial('bed',69,394,106,140,.54,'#9cac91'),initial('wardrobe',295,438,43,101,2.325,'#bf9b68'),initial('table',365,159,123,50,.755,'#d4b58a'),initial('sofa',360,243,43,46,.62,'#9cac91')];
+const sharedDefault=[{"id":"c91e7ca1-8a11-409a-9834-5ad9c2ba4c49","type":"bed","x":-3.499525836060023,"z":2.4171946061273952,"w":1.4469,"d":1.911,"h":0.54,"rotation":180,"color":"#9cac91"},{"id":"221c1613-652b-4ddb-854c-0e39cb52d3a9","type":"wardrobe","x":4.059083703971882,"z":-2.499275711350464,"w":0.52,"d":1.2,"h":2.325,"rotation":0,"color":"#bf9b68"},{"id":"9538a9fd-ddc5-4930-a81e-fa7a6b44a88d","type":"table","x":0.9646345844566528,"z":-0.6297392040034251,"w":1.6789500000000002,"d":0.6825,"h":0.755,"rotation":90,"color":"#d4b58a"},{"id":"b0dba8a9-2b9f-4da3-99fe-ee3b19cad0de","type":"sofa","x":2.3860835966646445,"z":-0.498039382087454,"w":0.5869500000000001,"d":0.6279,"h":0.62,"rotation":270,"color":"#9cac91"},{"id":"4b04cf53-74ac-46cd-a4b6-deccc6996200","type":"bed","w":1.45,"d":1.91,"h":0.54,"color":"#9cac91","x":-3.5712772650131925,"z":-0.993987627649484,"rotation":0},{"id":"0b334570-6efd-4863-ae57-a32f8d602eaf","type":"sofa","x":2.3806894459049506,"z":-1.6533895354749082,"w":0.5869500000000001,"d":0.6279,"h":0.62,"rotation":270,"color":"#9cac91"},{"id":"1a4062b5-e5f7-47f5-8483-1416d83e4629","type":"sofa","x":2.4174237439680666,"z":0.05871389499068291,"w":0.5869500000000001,"d":0.6279,"h":0.62,"rotation":270,"color":"#9cac91"},{"id":"a8bb3d38-082f-401a-9cba-97aec1ec067b","type":"sofa","x":2.376208970866901,"z":-1.0692306723362743,"w":0.5869500000000001,"d":0.6279,"h":0.62,"rotation":270,"color":"#9cac91"},{"id":"8b889930-dc32-46fc-8aa9-87b65a2fc9fa","type":"wardrobe","x":-0.631338581371863,"z":-0.710540326554864,"w":0.5869500000000001,"d":1.3786500000000002,"h":2.325,"rotation":0,"color":"#bf9b68"},{"id":"ed1e3d48-0f91-4339-9849-4dea45aebc36","type":"wardrobe","x":-0.5883088846264443,"z":2.6847925494429616,"w":0.5869500000000001,"d":1.3786500000000002,"h":2.325,"rotation":0,"color":"#bf9b68"}];
+let furniture=JSON.parse(JSON.stringify(sharedDefault));
 let selected=null, meshes=new Map(), selectionBox=null, past=[],future=[],editMode=false,drag=null;
 const clone=v=>JSON.parse(JSON.stringify(v));
 function say(text){$('notice').textContent=text}
@@ -73,7 +74,8 @@ function makeFurniture(f){
  }else if(f.type==='sofa'){part(0,0,1,1,.38/.62,0,f.color);part(0,(243+3.5-266)/46,1,7/46,.24/.62,.38/.62,f.color);
  }else if(f.type==='chair'){part(0,0,1,1,.1,.45,f.color);part(0,-.44,1,.12,.55,.45,f.color);for(const x of [-.38,.38])for(const z of [-.38,.38])part(x,z,.12,.12,.45,0,f.color);
  }else if(f.type==='vanity'){part(0,0,1,1,.07,.5,f.color);for(const x of [-.42,.42])part(x,0,.1,.85,.5,0,f.color);part(0,-.46,.7,.06,.43,.57,'#b8d8dd');
- }else if(f.type==='fridge'){part(0,0,1,1,1,0,f.color);part(.32,.505,.025,.02,.32,.38,'#6b7474');
+ }else if(f.type==='tv'){part(0,0,1,1,1,1.1/f.h,f.color);part(0,.51,.94,.06,.9,1.1/f.h+.05,'#162937');
+ }else if(f.type==='fridge'){part(0,0,1,1,1,0,f.color);part(0,.505,.95,.025,.012,.68,'#6b7474');part(.32,.525,.025,.025,.32,.28,'#6b7474');
  }else{part(0,0,1,1,1,.9/f.h,f.color)}
  scene.add(g);g.updateMatrixWorld(true);return g;
 }
